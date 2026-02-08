@@ -1,29 +1,55 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>LUKTECH-MD Pair</title>
+  <title>LUKTECH-MD QR Pair</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 50px;
+      background-color: #f2f2f2;
+    }
+    img {
+      margin: 20px 0;
+      border: 4px solid #333;
+      border-radius: 8px;
+    }
+    #status {
+      font-size: 1.2em;
+      color: #555;
+    }
+  </style>
 </head>
 <body>
-  <h2>Pair Your WhatsApp</h2>
-
-  <input type="text" id="number" placeholder="2567xxxxxxxx">
-  <button onclick="pair()">Generate Code</button>
-
-  <h3 id="result"></h3>
+  <h2>LUKTECH-MD WhatsApp Bot</h2>
+  <p>Scan this QR in WhatsApp → Linked Devices</p>
+  <img id="qr" width="300" />
+  <p id="status">Waiting for QR...</p>
 
   <script>
-    async function pair() {
-      const number = document.getElementById("number").value
-      const res = await fetch("/pair", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ number })
-      })
+    async function fetchQR() {
+      try {
+        const res = await fetch("/qr")
+        const data = await res.json()
 
-      const data = await res.json()
-      document.getElementById("result").innerText =
-        data.code || data.error
+        if (data.status === "connected") {
+          document.getElementById("status").innerText = "Bot Connected ✅"
+          document.getElementById("qr").style.display = "none"
+        } else if (data.qr) {
+          document.getElementById("qr").src = data.qr
+          document.getElementById("status").innerText = "Scan this QR in WhatsApp"
+          document.getElementById("qr").style.display = "inline"
+        } else {
+          document.getElementById("status").innerText = "Waiting for QR..."
+        }
+      } catch (err) {
+        console.log("QR fetch error:", err)
+        document.getElementById("status").innerText = "Error fetching QR..."
+      }
     }
+
+    setInterval(fetchQR, 5000)
+    fetchQR()
   </script>
 </body>
 </html>
