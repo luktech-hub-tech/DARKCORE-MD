@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>LUKTECH-MD Pair</title>
+</head>
+<body>
+  <h2>Pair Your WhatsApp</h2>
+
+  <input type="text" id="number" placeholder="2567xxxxxxxx">
+  <button onclick="pair()">Generate Code</button>
+
+  <h3 id="result"></h3>
+
+  <script>
+    async function pair() {
+      const number = document.getElementById("number").value
+      const res = await fetch("/pair", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ number })
+      })
+
+      const data = await res.json()
+      document.getElementById("result").innerText =
+        data.code || data.error
+    }
+  </script>
+</body>
+</html>
